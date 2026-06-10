@@ -52,7 +52,7 @@ localStorage.setItem("employees", JSON.stringify(employees));
 let loginHistory = JSON.parse(localStorage.getItem("loginHistory")) || [];
 
 // ================= ADMIN =================
-const admin = { id: "admin", pass: "0000" };
+const admin = { id: "danidani", pass: "19831983" };
 
 // ================= FORMAT SALARY =================
 function formatSalary(amount){
