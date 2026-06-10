@@ -1,44 +1,42 @@
 html, body {
   margin: 0;
   padding: 0;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
+  font-family: Arial;
   background: #111;
   overflow: hidden;
-  font-family: Arial;
+  -webkit-text-size-adjust: 100%;
 }
 
-/* ❌ حذف flex کامل (علت shrink شدن همین بود) */
+/* 🚨 مهم: حذف 100vw (عامل shrink در PWA) */
 body {
   display: block;
 }
 
 /* 🚨 FULLSCREEN واقعی */
 .login-box {
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
 
   padding: 20px;
   box-sizing: border-box;
 
   background: #111;
-  border-radius: 0;
-
   color: white;
-  text-align: center;
 
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
 
-  gap: 12px;
+  gap: 14px;
 }
 
 /* لوگو */
 img.logo {
-  width: 70%;
-  max-width: 300px;
+  width: 80%;
+  max-width: 320px;
   height: auto;
 }
 
@@ -46,48 +44,56 @@ img.logo {
 h2 {
   font-size: 28px;
   margin: 0;
-  color: white;
 }
 
+/* متن */
 p {
   font-size: 16px;
   opacity: 0.7;
-  margin: 10px 0;
+  margin: 0;
 }
 
-/* input ها */
+/* input ها 🚨 مهم: font-size 16px جلوگیری از zoom */
 .login-box input {
   width: 100%;
-  max-width: 380px;
-  padding: 12px;
-  border-radius: 8px;
+  max-width: 420px;
+
+  padding: 14px;
+  border-radius: 10px;
   border: none;
   outline: none;
-  font-size: 14px;
+
+  font-size: 16px;
+  box-sizing: border-box;
 }
 
 /* دکمه */
 .login-box button {
   width: 100%;
-  max-width: 380px;
-  padding: 12px;
+  max-width: 420px;
+
+  padding: 14px;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
+
   background: #f5c542;
-  cursor: pointer;
   font-weight: bold;
+  cursor: pointer;
 }
 
-/* تصاویر پایین (اگر استفاده می‌کنی) */
+/* تصاویر پایین */
 .bottom-images {
-  margin-top: 20px;
+  position: absolute;
+  bottom: 20px;
+  width: 100%;
+
   display: flex;
-  gap: 10px;
   justify-content: center;
+  gap: 10px;
 }
 
 .bottom-images img {
-  width: 80px;
-  height: 80px;
+  width: 70px;
+  height: 70px;
   object-fit: contain;
 }
