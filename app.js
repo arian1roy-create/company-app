@@ -1,3 +1,4 @@
+// ================= EMPLOYEES (DEFAULT DATA) =================
 let defaultEmployees = {
   "123": {
     pass: "123",
@@ -10,7 +11,6 @@ let defaultEmployees = {
     expiry: "12/28",
     cvv2: "123"
   },
-
   "456": {
     pass: "456",
     name: "Sara Khan",
@@ -24,37 +24,36 @@ let defaultEmployees = {
   }
 };
 
-// ================= SAFE LOAD =================
-let employees = {};
+// ================= SAFE LOAD (FIXED) =================
+let employees;
 
-let saved = localStorage.getItem("employees");
+const savedEmployees = localStorage.getItem("employees");
 
-if (saved) {
-  const parsed = JSON.parse(saved);
-
-  // merge old + new fields
-  for (const id in defaultEmployees) {
-    parsed[id] = {
-      ...defaultEmployees[id],
-      ...parsed[id]
-    };
+if (savedEmployees) {
+  try {
+    employees = JSON.parse(savedEmployees);
+  } catch (e) {
+    employees = defaultEmployees;
   }
-
-  employees = parsed;
 } else {
   employees = defaultEmployees;
+  localStorage.setItem("employees", JSON.stringify(defaultEmployees));
 }
-
-// ذخیره نسخه نهایی
-localStorage.setItem("employees", JSON.stringify(employees));
 
 // ================= HISTORY =================
 let loginHistory = JSON.parse(localStorage.getItem("loginHistory")) || [];
 
 // ================= ADMIN =================
-const admin = { id: "danidani", pass: "19831983" };
+const adminKey = "admin_data";
 
-// ================= FORMAT SALARY =================
+let admin = JSON.parse(localStorage.getItem(adminKey));
+
+if (!admin) {
+  admin = { id: "1111", pass: "1111" };
+  localStorage.setItem(adminKey, JSON.stringify(admin));
+}
+
+// ================= FORMAT =================
 function formatSalary(amount){
   return Number(amount).toLocaleString("de-DE") + " €";
 }
@@ -70,12 +69,13 @@ function login(){
     return;
   }
 
-  // ADMIN
+  // ================= ADMIN =================
   if(empId === admin.id && pass === admin.pass){
     openAdminPanel();
     return;
   }
 
+  // ================= EMPLOYEE =================
   const user = employees[empId];
 
   if(!user){
@@ -97,69 +97,30 @@ function login(){
 
   localStorage.setItem("loginHistory", JSON.stringify(loginHistory));
 
- document.body.innerHTML = `
-  <div style="padding:20px;color:white;font-family:tahoma;background:#0f172a;min-height:100vh">
+  openUserPanel(empId, user);
+}
 
-    <h2 style="margin:0;text-align:center">🏦 Commerzbank</h2>
+// ================= USER PANEL =================
+function openUserPanel(empId, user){
 
-    <p style="opacity:0.6;text-align:center;margin-top:5px;font-size:14px">
-      Arian Urban Development Company
-    </p>
+  document.body.innerHTML = `
+    <div style="padding:20px;color:white;background:#0f172a;min-height:100vh">
 
-    <div style="background:#1e293b;padding:12px;margin:10px 0;border-radius:10px">
-      🆔 ID: ${empId}
+      <h2>${user.name}</h2>
+
+      <p>ID: ${empId}</p>
+      <p>Salary: ${formatSalary(user.salary)}</p>
+      <p>IBAN: ${user.iban}</p>
+      <p>Card: ${user.cardNumber}</p>
+      <p>Account: ${user.accountNumber}</p>
+
+      <button onclick="location.reload()"
+        style="padding:10px;width:100%;background:red;color:white;border:none;border-radius:8px;margin-top:20px">
+        Logout
+      </button>
+
     </div>
-
-    <div style="background:#1e293b;padding:12px;margin:10px 0;border-radius:10px">
-      👤 Name: ${user.name}
-    </div>
-
-    <div style="background:#1e293b;padding:12px;margin:10px 0;border-radius:10px">
-      💰 Salary: ${formatSalary(user.salary)}
-    </div>
-
-    <div style="background:#1e293b;padding:12px;margin:10px 0;border-radius:10px">
-      🏦 IBAN: ${user.iban}
-    </div>
-
-    <div style="background:#1e293b;padding:12px;margin:10px 0;border-radius:10px">
-      💳 Card: ${user.cardNumber}
-    </div>
-
-    <div style="background:#1e293b;padding:12px;margin:10px 0;border-radius:10px">
-      📁 Account: ${user.accountNumber}
-    </div>
-
-    <div style="background:#1e293b;padding:12px;margin:10px 0;border-radius:10px">
-      📶 Status: 
-      <b style="color:${user.status==="Online"?"lightgreen":"orange"}">
-        ${user.status}
-      </b>
-    </div>
-
-    <!-- ✨ NEW FIELDS ADDED -->
-    <div style="background:#1e293b;padding:12px;margin:10px 0;border-radius:10px">
-      📅 Expiry Date: ${user.expiry || "12/28"}
-    </div>
-
-    <div style="background:#1e293b;padding:12px;margin:10px 0;border-radius:10px">
-      🔐 CVV2: ${user.cvv2 || "***"}
-    </div>
-
-    <button onclick="location.reload()" style="
-      width:100%;
-      padding:12px;
-      background:red;
-      color:white;
-      border:none;
-      border-radius:10px;
-      margin-top:20px;
-    ">
-      Logout
-    </button>
-
-  </div>
-`; 
+  `;
 }
 
 // ================= ADMIN PANEL =================
@@ -172,264 +133,63 @@ function openAdminPanel(){
   for(const id in employees){
 
     const e = employees[id];
-    if(!e) continue;
-
     const salary = Number(e.salary) || 0;
 
     count++;
     totalSalary += salary;
 
     list += `
-      <div style="background:#222;padding:12px;margin:10px 0;border-radius:10px;color:white">
-
+      <div style="background:#222;color:white;padding:10px;margin:10px 0;border-radius:10px">
         <b>${e.name}</b><br>
         ID: ${id}<br>
-        Salary: ${formatSalary(salary)}<br>
-        Status: ${e.status}<br><br>
-
-        <button onclick="editEmployee('${id}')"
-          style="background:orange;color:white;padding:6px;border:none;border-radius:6px">
-          ✏️ Edit
-        </button>
-
-        <button onclick="deleteEmployee('${id}')"
-          style="background:red;color:white;padding:6px;border:none;border-radius:6px">
-          ❌ Delete
-        </button>
-
+        Salary: ${formatSalary(salary)}
       </div>
     `;
   }
 
   document.body.innerHTML = `
-  <div style="padding:20px;color:white;font-family:tahoma;background:#0f172a;min-height:100vh">
+    <div style="padding:20px;color:white;background:#0f172a;min-height:100vh">
 
-    <h2 style="margin:0">🏦 Commerzbank</h2>
-    <p style="opacity:0.6;margin-top:5px;font-size:14px">
-      Arian Urban Development Company
-    </p>
+      <h2>ADMIN PANEL</h2>
 
-    <div style="background:#111;padding:12px;border-radius:10px;margin-top:10px">
-      👥 Employees: ${count}<br>
-      💰 Total Salary: ${formatSalary(totalSalary)}
+      <div style="background:#111;padding:10px;border-radius:10px;margin:10px 0">
+        👥 Employees: ${count}<br>
+        💰 Total Salary: ${formatSalary(totalSalary)}
+      </div>
+
+      <button onclick="resetData()" style="
+        width:100%;
+        padding:12px;
+        background:red;
+        color:white;
+        border:none;
+        border-radius:10px;
+        margin:10px 0;
+      ">
+        Reset Data
+      </button>
+
+      <button onclick="location.reload()" style="
+        width:100%;
+        padding:12px;
+        background:#444;
+        color:white;
+        border:none;
+        border-radius:10px;
+        margin-bottom:10px;
+      ">
+        Logout
+      </button>
+
+      ${list}
+
     </div>
-
-    <button onclick="showAddForm()" style="background:green;color:white;padding:10px;border:none;border-radius:6px;margin-top:10px;width:100%">
-      ➕ Add Employee
-    </button>
-
-    <button onclick="showLoginHistory()" style="background:#2196F3;color:white;padding:10px;border:none;border-radius:6px;margin-top:10px;width:100%">
-      📜 History
-    </button>
-
-    <button onclick="location.reload()" style="background:#444;color:white;padding:10px;border:none;border-radius:6px;margin-top:10px;width:100%">
-      🔄 Refresh
-    </button>
-
-    <!-- 🔥 RESET BUTTON ADDED -->
-    <button onclick="
-      localStorage.removeItem('employees');
-      localStorage.removeItem('loginHistory');
-      location.reload();
-    " 
-    style="background:#ff3b30;color:white;padding:10px;border:none;border-radius:6px;margin-top:10px;width:100%">
-      🔄 Reset Data
-    </button>
-
-    <hr>
-
-    ${list}
-
-  </div>
   `;
 }
 
-// ================= DELETE =================
-function deleteEmployee(id){
-  delete employees[id];
-  localStorage.setItem("employees", JSON.stringify(employees));
-  openAdminPanel();
-}
-
-// ================= ADD FORM =================
-function showAddForm(){
-
-  document.body.innerHTML = `
-  <div style="padding:20px;color:white;font-family:tahoma;background:#0f172a;min-height:100vh">
-
-    <h2 style="margin:0;text-align:center">🏦 Commerzbank</h2>
-    <p style="opacity:0.6;text-align:center;margin-top:5px;font-size:14px">
-      Arian Urban Development Company
-    </p>
-
-    <input id="newId" placeholder="ID" style="width:100%;padding:10px;margin:5px 0"><br>
-    <input id="newPass" placeholder="Password" style="width:100%;padding:10px;margin:5px 0"><br>
-    <input id="newName" placeholder="Name" style="width:100%;padding:10px;margin:5px 0"><br>
-    <input id="newSalary" placeholder="Salary" style="width:100%;padding:10px;margin:5px 0"><br>
-
-    <input id="newIban" placeholder="IBAN" style="width:100%;padding:10px;margin:5px 0"><br>
-    <input id="newCard" placeholder="Card Number" style="width:100%;padding:10px;margin:5px 0"><br>
-    <input id="newAccount" placeholder="Account Number" style="width:100%;padding:10px;margin:5px 0"><br>
-
-    <!-- 🔥 NEW FIELDS -->
-    <input id="newExpiry" placeholder="Expiry Date (12/28)" style="width:100%;padding:10px;margin:5px 0"><br>
-    <input id="newCvv2" placeholder="CVV2" style="width:100%;padding:10px;margin:5px 0"><br>
-
-    <select id="newStatus" style="width:100%;padding:10px;margin:5px 0">
-      <option>Online</option>
-      <option>Offline</option>
-    </select>
-
-    <button onclick="addEmployee()" style="
-      width:100%;
-      padding:12px;
-      background:green;
-      color:white;
-      border:none;
-      border-radius:8px;
-      margin-top:10px;
-    ">
-      Save
-    </button>
-
-    <button onclick="openAdminPanel()" style="
-      width:100%;
-      padding:12px;
-      background:#444;
-      color:white;
-      border:none;
-      border-radius:8px;
-      margin-top:10px;
-    ">
-      Back
-    </button>
-
-  </div>
-  `;
-}
-// ================= ADD =================
-function addEmployee(){
-
-  const id = document.getElementById("newId").value.trim();
-  const pass = document.getElementById("newPass").value.trim();
-  const name = document.getElementById("newName").value.trim();
-  const salary = Number(document.getElementById("newSalary").value.trim());
-  const iban = document.getElementById("newIban").value.trim();
-
-  const cardNumber = document.getElementById("newCard").value.trim();
-  const accountNumber = document.getElementById("newAccount").value.trim();
-  const status = document.getElementById("newStatus").value;
-
-  // 🔥 NEW FIELDS
-  const expiry = document.getElementById("newExpiry")?.value || "";
-  const cvv2 = document.getElementById("newCvv2")?.value || "";
-
-  if(!id || !pass || !name){
-    alert("Fill required fields");
-    return;
-  }
-
-  if(isNaN(salary)){
-    alert("Salary must be number");
-    return;
-  }
-
-  if(employees[id]){
-    alert("Employee already exists");
-    return;
-  }
-
-  employees[id] = {
-    pass,
-    name,
-    salary,
-    iban,
-    cardNumber,
-    accountNumber,
-    status,
-    expiry,
-    cvv2
-  };
-
-  localStorage.setItem("employees", JSON.stringify(employees));
-
-  alert("Employee added!");
-  openAdminPanel();
-}
-// ================= EDIT =================
-function editEmployee(id){
-
-  const e = employees[id];
-  if(!e) return;
-
-  document.body.innerHTML = `
-  <div style="padding:20px;color:white;font-family:tahoma;background:#0f172a;min-height:100vh">
-
-    <h2 style="text-align:center">✏️ Edit Employee</h2>
-
-    <input id="editName" value="${e.name}" style="width:100%;padding:10px;margin:5px 0"><br>
-    <input id="editSalary" value="${e.salary}" style="width:100%;padding:10px;margin:5px 0"><br>
-
-    <input id="editIban" value="${e.iban}" style="width:100%;padding:10px;margin:5px 0"><br>
-    <input id="editCard" value="${e.cardNumber}" style="width:100%;padding:10px;margin:5px 0"><br>
-    <input id="editAccount" value="${e.accountNumber}" style="width:100%;padding:10px;margin:5px 0"><br>
-
-    <!-- 🔥 NEW FIELDS -->
-    <input id="editExpiry" value="${e.expiry || ''}" placeholder="Expiry Date" style="width:100%;padding:10px;margin:5px 0"><br>
-    <input id="editCvv2" value="${e.cvv2 || ''}" placeholder="CVV2" style="width:100%;padding:10px;margin:5px 0"><br>
-
-    <select id="editStatus" style="width:100%;padding:10px;margin:5px 0">
-      <option ${e.status==="Online"?"selected":""}>Online</option>
-      <option ${e.status==="Offline"?"selected":""}>Offline</option>
-    </select>
-
-    <button onclick="saveEdit('${id}')" style="
-      width:100%;
-      padding:12px;
-      background:green;
-      color:white;
-      border:none;
-      border-radius:8px;
-      margin-top:10px
-    ">
-      Save
-    </button>
-
-    <button onclick="openAdminPanel()" style="
-      width:100%;
-      padding:12px;
-      background:#444;
-      color:white;
-      border:none;
-      border-radius:8px;
-      margin-top:10px
-    ">
-      Back
-    </button>
-
-  </div>
-  `;
-}
-// ================= SAVE EDIT =================
-function saveEdit(id){
-
-  const e = employees[id];
-  if(!e) return;
-
-  e.name = editName.value.trim();
-  e.salary = Number(editSalary.value.trim());
-  e.iban = editIban.value.trim();
-  e.cardNumber = editCard.value.trim();
-  e.accountNumber = editAccount.value.trim();
-  e.status = editStatus.value;
-
-  // 🔥 NEW FIELDS
-  e.expiry = editExpiry.value.trim();
-  e.cvv2 = editCvv2.value.trim();
-
-  // 💾 save to storage
-  localStorage.setItem("employees", JSON.stringify(employees));
-
-  alert("Updated!");
-  openAdminPanel();
-}
+// ================= RESET (IMPORTANT FIX) =================
+function resetData(){
+  localStorage.removeItem("employees");
+  localStorage.removeItem("loginHistory");
+  location.reload();
+          }
