@@ -13,9 +13,10 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#111111">
 
-<!-- mobile web app support -->
+<!-- mobile / fullscreen support -->
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
 </head>
 
@@ -44,13 +45,13 @@
 <!-- APP SCRIPT -->
 <script src="app.js"></script>
 
-<!-- SERVICE WORKER -->
+<!-- SERVICE WORKER (clean + safe) -->
 <script>
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./sw.js")
-      .then(() => console.log("PWA Active"))
-      .catch(err => console.log("SW Error:", err));
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg => console.log('PWA Active:', reg.scope))
+      .catch(err => console.log('SW Error:', err));
   });
 }
 </script>
