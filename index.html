@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+<title>Company Portal</title>
+
+<link rel="stylesheet" href="style.css">
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#111111">
+
+<!-- mobile web app support -->
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+</head>
+
+<body>
+
+<!-- LOGIN -->
+<div class="login-box">
+
+  <img src="logo.png" class="logo">
+
+  <h1>Company Login</h1>
+
+  <input id="empId" type="text" placeholder="Employee ID">
+  <input id="password" type="password" placeholder="Password">
+
+  <button onclick="login()">Login</button>
+
+</div>
+
+<!-- IMAGES -->
+<div class="bottom-images">
+  <img src="img1.png" alt="img1">
+  <img src="img2.png" alt="img2">
+</div>
+
+<!-- APP SCRIPT -->
+<script src="app.js"></script>
+
+<!-- SERVICE WORKER -->
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js")
+      .then(() => console.log("PWA Active"))
+      .catch(err => console.log("SW Error:", err));
+  });
+}
+</script>
+
+</body>
+</html>

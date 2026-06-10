@@ -1,0 +1,93 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #111;
+  overflow: hidden;
+  font-family: Arial;
+}
+
+/* ❌ حذف flex کامل (علت shrink شدن همین بود) */
+body {
+  display: block;
+}
+
+/* 🚨 FULLSCREEN واقعی */
+.login-box {
+  width: 100vw;
+  height: 100vh;
+
+  padding: 20px;
+  box-sizing: border-box;
+
+  background: #111;
+  border-radius: 0;
+
+  color: white;
+  text-align: center;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  gap: 12px;
+}
+
+/* لوگو */
+img.logo {
+  width: 70%;
+  max-width: 300px;
+  height: auto;
+}
+
+/* عنوان‌ها */
+h2 {
+  font-size: 28px;
+  margin: 0;
+  color: white;
+}
+
+p {
+  font-size: 16px;
+  opacity: 0.7;
+  margin: 10px 0;
+}
+
+/* input ها */
+.login-box input {
+  width: 100%;
+  max-width: 380px;
+  padding: 12px;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+  font-size: 14px;
+}
+
+/* دکمه */
+.login-box button {
+  width: 100%;
+  max-width: 380px;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  background: #f5c542;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+/* تصاویر پایین (اگر استفاده می‌کنی) */
+.bottom-images {
+  margin-top: 20px;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.bottom-images img {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+}
